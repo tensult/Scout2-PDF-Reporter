@@ -26,7 +26,7 @@ var pdfOptions = {
     "header": {
         "height": "20mm"
     },
-    "base": `file://${__dirname}`,
+    "base": `file://${__dirname}/`,
     "footer": {
         "height": "15mm",
         "contents": {
@@ -34,7 +34,7 @@ var pdfOptions = {
         <div class="footer">
           <hr>
           <span class="copyright" style="float: left;">
-            Copyright &copy; Eighty Two East IT Solutions Pvt Ltd ${new Date().getUTCFullYear()}
+            Generated using Scout2-PDF-Reporter by Tensult
           </span>
           <span class="pageNumber" style="float: right;">
             {{page}} of {{pages}}
