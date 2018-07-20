@@ -1,5 +1,5 @@
 # Scout2-PDF-Reporter
-Generates PDF report from Scout2 output using inc-awsconfig files of scout 2 report.
+Generates PDF report from Scout2 output using inc-awsconfig files of [scout 2](https://github.com/nccgroup/Scout2) report.
 
 ## Install
  ```
