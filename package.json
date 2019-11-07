@@ -23,6 +23,6 @@
   "dependencies": {
     "cli": "^1.0.1",
     "ejs": "^2.5.6",
-    "html-pdf": "^2.1.0"
+    "puppeteer": "^2.0.0"
   }
 }

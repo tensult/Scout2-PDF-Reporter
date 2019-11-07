@@ -1,7 +1,7 @@
 const cli = require('cli');
 const ejs = require('ejs');
 const fs = require('fs');
-const pdf = require('html-pdf');
+const puppeteer = require('puppeteer');
 
 const cliArgs = cli.parse({
     reportPath: ['r', 'Scout2 report path', 'file'],
@@ -18,7 +18,7 @@ require(cliArgs.reportPath);
 var pdfOptions = {
     format: 'A4',
     "border": {
-        "top": "0.2in",            // default is 0, units: mm, cm, in, px 
+        "top": "0.2in", // default is 0, units: mm, cm, in, px 
         "right": "0.2in",
         "bottom": "0.2in",
         "left": "0.2in"
@@ -44,6 +44,22 @@ var pdfOptions = {
     },
 };
 
+async function createPDF(html) {
+    let browser = null;
+    try {
+        browser = await puppeteer.launch();;
+        const page = await browser.newPage();
+        await page.setContent(html);
+        return await page.pdf(pdfOptions);
+    } catch (error) {
+        throw error;
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
+    }
+}
+
 function processReportData(reportData) {
     let services = reportData.services;
     for (let serviceName in services) {
@@ -54,17 +70,17 @@ function processReportData(reportData) {
             reportData.services[serviceName].findings[finding].itemHeader = itemHeaderPathValues.filter(function (elm) {
                 return elm !== 'id';
             }).splice(1);
-            if(!findingData.items) {
+            if (!findingData.items) {
                 continue;
             }
             let itemsDetails = findingData.items.map(function (item) {
                 let itemValues = item.split('.', itemHeaderPathValues.length);
-                let itemDetails = itemValues.reduce(function(obj, val) {
+                let itemDetails = itemValues.reduce(function (obj, val) {
                     obj = obj[val];
                     return obj;
                 }, services);
                 itemValues.shift();
-                let itemValuesForDisplay = itemValues.filter(function(val, index) {
+                let itemValuesForDisplay = itemValues.filter(function (val, index) {
                     return (index % 2 == 1);
                 });
                 itemDetails.itemValuesForDisplay = itemValuesForDisplay;
@@ -81,8 +97,9 @@ ejs.renderFile("report.ejs", processedReportData, {}, function (err, html) {
         console.error(err);
     }
     fs.writeFileSync('report.html', html, 'utf-8');
-    pdf.create(html, pdfOptions).toFile('./report.pdf', function (err, res) {
-        if (err) return console.log(err);
-        console.log(res);
-    });
+    const reportHtmlData = fs.readFileSync('report.html');
+    createPDF(reportHtmlData)
+        .then(pdfData => fs.writeFileSync('./report.pdf', pdfData))
+        .catch(error => console.error(error));
+
 });
