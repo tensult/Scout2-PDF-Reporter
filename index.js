@@ -17,7 +17,7 @@ require(cliArgs.reportPath);
 
 var pdfOptions = {
     format: 'A4',
-    "border": {
+    "margin": {
         "top": "0.2in", // default is 0, units: mm, cm, in, px 
         "right": "0.2in",
         "bottom": "0.2in",
