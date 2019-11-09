@@ -2,6 +2,7 @@ const cli = require('cli');
 const ejs = require('ejs');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+const open = require('open');
 
 const cliArgs = cli.parse({
     reportPath: ['r', 'Scout2 report path', 'file'],
@@ -27,10 +28,7 @@ var pdfOptions = {
         "height": "20mm"
     },
     "base": `file://${__dirname}/`,
-    "footer": {
-        "height": "15mm",
-        "contents": {
-            default: `
+    "footerTemplate": `
         <div class="footer">
           <hr>
           <span class="copyright" style="float: left;">
@@ -40,8 +38,7 @@ var pdfOptions = {
             {{page}} of {{pages}}
           </span>
         </div>`
-        }
-    },
+
 };
 
 async function createPDF(html) {
@@ -96,10 +93,13 @@ ejs.renderFile("report.ejs", processedReportData, {}, function (err, html) {
     if (err) {
         console.error(err);
     }
-    fs.writeFileSync('report.html', html, 'utf-8');
-    const reportHtmlData = fs.readFileSync('report.html');
+    fs.writeFileSync('report.html', html, { encoding: 'utf-8' });
+    const reportHtmlData = fs.readFileSync('report.html', { encoding: 'utf-8' });
     createPDF(reportHtmlData)
-        .then(pdfData => fs.writeFileSync('./report.pdf', pdfData))
+        .then((pdfData) => {
+            fs.writeFileSync('./report.pdf', pdfData);
+            open('./report.pdf');
+        })
         .catch(error => console.error(error));
 
 });
